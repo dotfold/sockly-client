@@ -13,12 +13,22 @@
 	</body>
 
 
-	<script type="text/javascript" src="client.js"></script>
+	<script type="text/javascript" src="//sockly.local.com/src/client.js"></script>
 
 	<script>
 
 		var sockly = new Sockly();
 		sockly.connect();
+
+		var count = 30;
+		var ms = 500;
+
+		var id = setInterval(function() {
+			sockly.timing(count * 500);
+			if (--count == 0) {
+				clearTimeout(id);
+			}
+		}, ms);
 
 	</script>
 

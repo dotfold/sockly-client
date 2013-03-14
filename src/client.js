@@ -5,18 +5,18 @@
 
 	var Sockly = function() {
 		this.socket = $socket;
+		this.prefix = '';
 	};
 
-	Sockly.version = '0.1.0-henceforth-sock-puppet';
-
-	// sockly
+	Sockly.version = '0.1.0-a-sock-appears';
 
 	Sockly.prototype = {
 		
-		/**
-		 * [connect description]
-		 * @return {[type]} [description]
-		 */
+		//
+		// ### function connect
+		// Create a WebSocket and attempt a connection using the
+		// supplied host and port details.
+		// 
 		connect: function() {
 			var socketURL = 'ws://localhost:3000';
 			this.socket = new WebSocket(socketURL);
@@ -35,12 +35,29 @@
 			}
 		},
 
-		// send to socket
-		/**
-		 * [send description]
-		 * @param  {[type]} message [description]
-		 * @return {[type]}         [description]
-		 */
+		// extract to own module
+		setPrefix: function(value) {
+			this.prefix = value;
+		},
+
+
+		timing: function(metric) {
+			var timingBuffer = this.prefix + metric + '|ms';
+			this.socket.send(timingBuffer);
+		},
+
+		guage: function() {
+
+		},
+
+		set: function() {
+
+		},
+
+		//
+		// ### function send message
+		// #### @message string the message to transmit over the socket
+		// 
 		send: function(message) {
 			this.socket.send(message);
 		},
@@ -57,12 +74,6 @@
 		}
 
 	};
-
-	(function(sockly) {
-
-
-
-	})(window.Sockly);
 
 /**
 	// socket setup
@@ -87,10 +98,4 @@
 
 })();
 
-(function (Sockly) {
-
-	// augment for building in the communication
-	// socket, or img tracking pixel, or...
-
-})(window.Sockly);
 
