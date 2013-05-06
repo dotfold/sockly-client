@@ -17,18 +17,24 @@
 
 	<script>
 
+		function runTest() {
+			var count = 10;
+			var ms = 500;
+
+			var id = setInterval(function() {
+				sockly.timing(count * 500);
+				if (--count == 0) {
+					clearTimeout(id);
+				}
+			}, ms);
+		}
+
 		var sockly = new Sockly();
-		sockly.connect();
+		sockly.connect('ws://localhost:3000', runTest);
 
-		var count = 30;
-		var ms = 500;
+		sockly.setPrefix('glork');
 
-		var id = setInterval(function() {
-			sockly.timing(count * 500);
-			if (--count == 0) {
-				clearTimeout(id);
-			}
-		}, ms);
+		
 
 	</script>
 
