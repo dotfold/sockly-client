@@ -1,11 +1,25 @@
 
-
+// TODO: browserifyify
+// TODO: <img> fallback
 
 (function($socket) {
 
 	var Sockly = function() {
-		this.socket = $socket;
+		// default metric prefix
 		this.prefix = '';
+
+		// default connection properties
+		this.defaultHost = 'ws://localhost';
+		this.defaultPort = 3000;
+
+		// statsd metric types
+		// https://github.com/etsy/statsd/blob/master/docs/metric_types.md
+		this.types = {
+			COUNT:	'c',
+			TIMING: 'ms',
+			GUAGE:	'g',
+			SET:	's'
+		}
 	};
 
 	Sockly.version = '0.1.0-a-sock-appears';
@@ -13,20 +27,34 @@
 	Sockly.prototype = {
 		
 		//
+		// ### function detect
+		// #### returns Boolean
+		// Detects if the environment supports WebSocket.
+		//
+		detect: function() {
+
+		},
+
+		//
 		// ### function connect
+		// #### socketUrl {String} full URL and port of the ws host
+		// Example: `ws://localhost:3000`
 		// Create a WebSocket and attempt a connection using the
 		// supplied host and port details.
 		// 
-		connect: function() {
-			var socketURL = 'ws://localhost:3000';
+		connect: function(socketUrl, callback) {
+			var socketURL = socketUrl || (this.defaultHost + ':' + this.defaultPort);
 			this.socket = new WebSocket(socketURL);
 
 			console.log('connecting...');
 
+			// set timeout for connect
+
 			this.socket.onopen = function() {
 				console.log('[client] onopen received');
 
-				this.send('hello');
+				// emit connect
+				callback.call(null, 'connected');
 			};
 
 			this.socket.onmessage = function(data) {
@@ -35,64 +63,83 @@
 			}
 		},
 
-		// extract to own module
+		//
+		// ### function setPrefix value
+		// #### value {String} prefix for statsd metrics
+		//
 		setPrefix: function(value) {
 			this.prefix = value;
 		},
 
-
-		timing: function(metric) {
-			var timingBuffer = this.prefix + metric + '|ms';
-			this.socket.send(timingBuffer);
+		//
+		// ### function count metric, prefix
+		// #### @metric Value of the timing metric
+		// #### @prefix (Optional) override default prefix
+		// Creates a counting metric and sends via the socket.
+		//
+		count: function(metric, prefix) {
+			var buffer = formatMessage(metric, prefix, this.types[count]);
+			send(buffer);
 		},
 
-		guage: function() {
-
+		//
+		// ### function timing metric
+		// #### metric Value of the timing metric
+		// #### @prefix (Optional) override default prefix
+		// Creates a timing metric and sends via the socket.
+		//
+		timing: function(metric, prefix) {
+			var buffer = this.formatMessage(metric, prefix, this.types.TIMING);
+			this.send(buffer);
 		},
 
-		set: function() {
+		//
+		// ### function guage metric
+		// #### metric Value of the guage metric
+		// #### @prefix (Optional) override default prefix
+		// Creates a guage metric and sends via the socket.
+		//
+		guage: function(metric, prefix) {
+			var buffer = formatMessage(metric, prefix, this.types[guage]);
+			send(buffer);
+		},
 
+		//
+		// ### function timing metric
+		// #### metric Value of the timing metric
+		// #### @prefix (Optional) override default prefix
+		// Creates a set metric and sends via the socket.
+		//
+		set: function(metric, prefix) {
+			var buffer = formatMessage(metric, prefix, this.types[set]);
+			send(buffer);
 		},
 
 		//
 		// ### function send message
 		// #### @message string the message to transmit over the socket
+		// Sends a message over the socket. Only statsd formatted
+		// messages will be read by the host.
 		// 
 		send: function(message) {
 			this.socket.send(message);
 		},
 
-		// subscribe to a message with a handler
-		/**
-		 * [on description]
-		 * @param  {[type]} message [description]
-		 * @param  {[type]} handler [description]
-		 * @return {[type]}         [description]
-		 */
-		subscribe: function(message, handler) {
-
+		//
+		// ### function formatMessage metric, prefix, type
+		// #### @metric the metric value
+		// #### @prefix a prefix for the metric, if any
+		// #### @type Corresponds to the types enumerator
+		//
+		formatMessage: function(metric, prefix, type) {
+			var pre = (prefix !== undefined) ? prefix : this.prefix;
+			if (pre !== '') {
+				pre = pre + ':';
+			}
+			return pre + metric + '|' + type;
 		}
 
 	};
-
-/**
-	// socket setup
-	var socketURL = 'ws://192.168.20.86:8124'
-	var socket = new WebSocket(socketURL);
-
-	// socket handlers
-	socket.onopen = function() {
-		console.log('[client] onopen received');
-	};
-
-	socket.onmesseage = function() {
-		console.log('[client] onmesseage received');
-	};
-
-	socket.onclose = function() {
-		console.log('[client] onclose received');
-	};
-*/
 
 	window.Sockly = Sockly;
 
