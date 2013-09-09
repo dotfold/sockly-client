@@ -2,7 +2,9 @@
 
 describe('Sockly', function() {
 	
-	sockly = new Sockly();
+	beforeEach(function() {
+		sockly = new Sockly();		
+	})
 
 	it('should have an instantiation', function() {
 		expect(sockly).toBeDefined();
@@ -31,6 +33,10 @@ describe('Sockly', function() {
 
 	describe('subscribe', function() {
 
+	});
+
+	describe('setPrefix', function() {
+		
 	});
 
 });

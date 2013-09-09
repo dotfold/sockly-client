@@ -1,4 +1,4 @@
-
+	
 // TODO: browserifyify
 // TODO: <img> fallback
 
@@ -32,7 +32,7 @@
 		// Detects if the environment supports WebSocket.
 		//
 		detect: function() {
-
+			return (typeof window.WebSocket.toString === '[object function]'); 
 		},
 
 		//
