@@ -9,6 +9,7 @@
 		this.prefix = '';
 
 		// default connection properties
+		// TODO from config
 		this.defaultHost = 'ws://localhost';
 		this.defaultPort = 3000;
 
@@ -31,7 +32,7 @@
 		// #### returns Boolean
 		// Detects if the environment supports WebSocket.
 		//
-		detect: function() {
+		isWebSocketSupported: function() {
 			return (typeof window.WebSocket.toString === '[object function]'); 
 		},
 
